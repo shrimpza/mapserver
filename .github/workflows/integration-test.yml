@@ -9,7 +9,7 @@ jobs:
     timeout-minutes: 10
 
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v3
 
     - name: integration-test
       run: ./integration-test.sh

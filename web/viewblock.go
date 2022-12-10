@@ -2,10 +2,10 @@ package web
 
 import (
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"mapserver/coords"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 type ViewBlock struct {
@@ -14,17 +14,18 @@ type ViewBlock struct {
 }
 
 func (api *Api) GetBlockData(resp http.ResponseWriter, req *http.Request) {
-	str := strings.TrimPrefix(req.URL.Path, "/api/viewblock/")
-	parts := strings.Split(str, "/")
-	if len(parts) != 3 {
+	// /api/viewblock/{x}/{y}/{z}
+	vars := mux.Vars(req)
+
+	if len(vars) != 3 {
 		resp.WriteHeader(500)
 		resp.Write([]byte("wrong number of arguments"))
 		return
 	}
 
-	x, _ := strconv.Atoi(parts[0])
-	y, _ := strconv.Atoi(parts[1])
-	z, _ := strconv.Atoi(parts[2])
+	x, _ := strconv.Atoi(vars["x"])
+	y, _ := strconv.Atoi(vars["y"])
+	z, _ := strconv.Atoi(vars["z"])
 
 	c := coords.NewMapBlockCoords(x, y, z)
 	mb, err := api.Context.MapBlockAccessor.GetMapBlock(c)

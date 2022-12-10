@@ -1,6 +1,7 @@
 package web
 
 import (
+	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
 	"image/color"
 	"mapserver/app"
@@ -8,7 +9,6 @@ import (
 	"mapserver/tilerenderer"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 type Tiles struct {
@@ -21,10 +21,10 @@ func (t *Tiles) Init() {
 }
 
 func (t *Tiles) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	str := strings.TrimPrefix(req.URL.Path, "/api/tile/")
-	// {layerId}/x/y/zoom
-	parts := strings.Split(str, "/")
-	if len(parts) != 4 {
+	// /api/tile/{layerId}/{x}/{y}/{zoom}
+	vars := mux.Vars(req)
+
+	if len(vars) != 4 {
 		resp.WriteHeader(500)
 		resp.Write([]byte("wrong number of arguments"))
 		return
@@ -33,10 +33,10 @@ func (t *Tiles) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	timer := prometheus.NewTimer(tileServeDuration)
 	defer timer.ObserveDuration()
 
-	layerid, _ := strconv.Atoi(parts[0])
-	x, _ := strconv.Atoi(parts[1])
-	y, _ := strconv.Atoi(parts[2])
-	zoom, _ := strconv.Atoi(parts[3])
+	layerid, _ := strconv.Atoi(vars["layerId"])
+	x, _ := strconv.Atoi(vars["x"])
+	y, _ := strconv.Atoi(vars["y"])
+	zoom, _ := strconv.Atoi(vars["zoom"])
 
 	c := coords.NewTileCoords(x, y, zoom, layerid)
 	tile, err := t.ctx.TileDB.GetTile(c)

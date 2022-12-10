@@ -6,7 +6,9 @@ import (
 
 type Config struct {
 	ConfigVersion             int                     `json:"configversion"`
+	BindHost                  string                  `json:"bindhost"`
 	Port                      int                     `json:"port"`
+	WebRoot                   string                  `json:"webroot"`
 	EnablePrometheus          bool                    `json:"enableprometheus"`
 	EnableRendering           bool                    `json:"enablerendering"`
 	EnableSearch              bool                    `json:"enablesearch"`

@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-//Public facing config
+// Public facing config
 type PublicConfig struct {
 	Version         string               `json:"version"`
 	Layers          []*layer.Layer       `json:"layers"`

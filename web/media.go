@@ -1,21 +1,22 @@
 package web
 
 import (
+	"github.com/gorilla/mux"
 	"mapserver/public"
 	"net/http"
-	"strings"
 )
 
 func (api *Api) GetMedia(resp http.ResponseWriter, req *http.Request) {
-	str := strings.TrimPrefix(req.URL.Path, "/api/media/")
-	parts := strings.Split(str, "/")
-	if len(parts) != 1 {
+	// /api/media/{filename}/{x}/{y}/{zoom}
+	vars := mux.Vars(req)
+
+	if len(vars) != 1 {
 		resp.WriteHeader(500)
 		resp.Write([]byte("wrong number of arguments"))
 		return
 	}
 
-	filename := parts[0]
+	filename := vars["filename"]
 	fallback, hasfallback := req.URL.Query()["fallback"]
 
 	content := api.Context.MediaRepo[filename]

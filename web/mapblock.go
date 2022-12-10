@@ -2,24 +2,25 @@ package web
 
 import (
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"mapserver/coords"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 func (api *Api) GetMapBlockData(resp http.ResponseWriter, req *http.Request) {
-	str := strings.TrimPrefix(req.URL.Path, "/api/mapblock/")
-	parts := strings.Split(str, "/")
-	if len(parts) != 3 {
+	// /api/mapblock/{x}/{y}/{z}
+	vars := mux.Vars(req)
+
+	if len(vars) != 3 {
 		resp.WriteHeader(500)
 		resp.Write([]byte("wrong number of arguments"))
 		return
 	}
 
-	x, _ := strconv.Atoi(parts[0])
-	y, _ := strconv.Atoi(parts[1])
-	z, _ := strconv.Atoi(parts[2])
+	x, _ := strconv.Atoi(vars["x"])
+	y, _ := strconv.Atoi(vars["y"])
+	z, _ := strconv.Atoi(vars["z"])
 
 	c := coords.NewMapBlockCoords(x, y, z)
 	mb, err := api.Context.MapBlockAccessor.GetMapBlock(c)

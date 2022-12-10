@@ -72,6 +72,16 @@ func addColorComponent(c *color.RGBA, value int) *color.RGBA {
 	}
 }
 
+func overmixColor(c *color.RGBA, r uint8, g uint8, b uint8) *color.RGBA {
+	scale := float32(c.A) / 255
+	return &color.RGBA{
+		R: clamp(int(r) + int(float32(c.R)*scale)),
+		G: clamp(int(g) + int(float32(c.G)*scale)),
+		B: clamp(int(b) + int(float32(c.B)*scale)),
+		A: 255,
+	}
+}
+
 func (r *MapBlockRenderer) Render(pos1, pos2 *coords.MapBlockCoords) (*image.NRGBA, error) {
 	if pos1.X != pos2.X {
 		return nil, errors.New("X does not line up")
@@ -208,23 +218,28 @@ func (r *MapBlockRenderer) Render(pos1, pos2 *coords.MapBlockCoords) (*image.NRG
 					imgX := x * IMG_SCALE
 					imgY := (15 - z) * IMG_SCALE
 
-					r32, g32, b32, a32 := c.RGBA()
-					r8, g8, b8, a8 := uint8(r32), uint8(g32), uint8(b32), uint8(a32)
+					//r32, g32, b32, a32 := c.RGBA()
+					//r8, g8, b8, a8 := uint8(r32), uint8(g32), uint8(b32), uint8(a32)
+					co := c
 					for Y := imgY; Y < imgY+IMG_SCALE; Y++ {
 						ix := (Y*IMG_SIZE + imgX) << 2
 						for X := 0; X < IMG_SCALE; X++ {
-							img.Pix[ix] = r8
+							//if c.A != 255 {
+							//	co = overmixColor(c, img.Pix[ix], img.Pix[ix+1], img.Pix[ix+2])
+							//}
+
+							img.Pix[ix] = co.R
 							ix++
-							img.Pix[ix] = g8
+							img.Pix[ix] = co.G
 							ix++
-							img.Pix[ix] = b8
+							img.Pix[ix] = co.B
 							ix++
-							img.Pix[ix] = a8
+							img.Pix[ix] = co.A
 							ix++
 						}
 					}
 
-					if c.A != 0xFF || !r.enableTransparency {
+					if c.A != 255 || !r.enableTransparency {
 						//not transparent, mark as rendered
 						foundBlocks++
 						xzOccupationMap[x][z] = true

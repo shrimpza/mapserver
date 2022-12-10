@@ -106,7 +106,9 @@ func ParseConfig(filename string) (*Config, error) {
 
 	cfg := Config{
 		ConfigVersion:             1,
+		BindHost:                  "",
 		Port:                      8080,
+		WebRoot:                   "/",
 		EnableRendering:           true,
 		EnablePrometheus:          true,
 		EnableSearch:              true,
